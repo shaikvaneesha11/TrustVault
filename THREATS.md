@@ -1,0 +1,1 @@
+guessing document ids (404 plus audit), a viewer trying to edit, delete or share (refused), an upload with a fake extension (detected by content), a stolen old session after logout (deleted), and a user with read access trying edit (refused). Also add what you accept for now: no rate limiting yet, and the 5 MB limit is checked after reading.
