@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta, timezone
-
-from fastapi import APIRouter, Depends
-from sqlalchemy import func, select
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import delete, func, select
+from app.models import AuditLog, Document, LoginSession, User
 from sqlalchemy.orm import Session
 
 from app.audit import verify_chain, write_audit
@@ -79,3 +78,39 @@ def all_documents(admin: User = Depends(require_role("admin")),
     return [{"id": d.id, "title": d.title, "owner": u.email,
              "created_at": d.created_at, "size_bytes": d.size_bytes}
             for d, u in rows]
+@router.get("/users")
+def list_users(admin: User = Depends(require_role("admin")),
+               db: Session = Depends(get_db)):
+    rows = db.scalars(select(User).order_by(User.id)).all()
+    return [{"id": u.id, "email": u.email, "role": u.role,
+             "is_active": u.is_active} for u in rows]
+
+
+@router.post("/users/{user_id}/deactivate")
+def deactivate(user_id: int, admin: User = Depends(require_role("admin")),
+               db: Session = Depends(get_db)):
+    if user_id == admin.id:
+        raise HTTPException(400, "You cannot deactivate yourself")
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(404, "User not found")
+    target.is_active = False
+    # Delete every login this person holds, so they are out immediately.
+    db.execute(delete(LoginSession).where(LoginSession.user_id == user_id))
+    db.commit()
+    write_audit(db, admin.id, "deactivate_user", "allowed", None,
+                f"user={user_id}")
+    return {"ok": True}
+
+
+@router.post("/users/{user_id}/activate")
+def activate(user_id: int, admin: User = Depends(require_role("admin")),
+             db: Session = Depends(get_db)):
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(404, "User not found")
+    target.is_active = True
+    db.commit()
+    write_audit(db, admin.id, "activate_user", "allowed", None,
+                f"user={user_id}")
+    return {"ok": True}
