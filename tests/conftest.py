@@ -15,6 +15,8 @@ os.environ["DATABASE_URL"] = test_url
 os.environ["COOKIE_SECURE"] = "0"
 
 from app.db import engine  # noqa: E402
+from app.db_rules import install_rules  # noqa: E402
 from app.models import Base  # noqa: E402
 
 Base.metadata.create_all(engine)
+install_rules(engine)
