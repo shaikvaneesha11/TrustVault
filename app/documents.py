@@ -207,6 +207,10 @@ def revoke(doc_id: int, target_user_id: int,
     if perm:
         db.delete(perm)
         db.commit()
-    write_audit(db, user.id, "revoke", "allowed", doc.id,
-                f"user={target_user_id}")
+        write_audit(db, user.id, "revoke", "allowed", doc.id,
+                    f"user={target_user_id}")
+    else:
+        # Nothing was removed, so the log must not claim it was.
+        write_audit(db, user.id, "revoke", "noop", doc.id,
+                    f"user={target_user_id} had no grant")
     return {"ok": True}
