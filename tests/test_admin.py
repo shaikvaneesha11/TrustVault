@@ -77,3 +77,14 @@ def test_admin_cannot_deactivate_self():
 def test_audit_chain_is_valid():
     admin = make_admin()
     assert admin.get("/admin/verify-chain").json()["valid"] is True
+
+def test_non_admins_cannot_deactivate_or_activate():
+    viewer, viewer_id = make_user("viewer")
+    owner, _ = make_user("owner")
+    anon = TestClient(app)
+    for path in (f"/admin/users/{viewer_id}/deactivate",
+                 f"/admin/users/{viewer_id}/activate"):
+        assert viewer.post(path).status_code == 403
+        assert owner.post(path).status_code == 403
+        assert anon.post(path).status_code == 401
+    assert viewer.get("/auth/me").status_code == 200

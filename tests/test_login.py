@@ -54,8 +54,11 @@ def test_session_dies_after_logout():
     client, email = TestClient(app), new_email()
     register(client, email)
     client.post("/auth/login", json={"email": email, "password": PASSWORD})
+    old_cookie = client.cookies.get("session")
     client.post("/auth/logout")
-    assert client.get("/auth/me").status_code == 401
+    replay = TestClient(app)
+    replay.cookies.set("session", old_cookie)
+    assert replay.get("/auth/me").status_code == 401
 
 
 def test_login_locks_after_repeated_failures():

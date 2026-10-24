@@ -97,6 +97,8 @@ def test_search_cannot_widen_access():
     for query in ("?q=Secret", "?q=%25", "?owner=owner", "?category="):
         ids = [d["id"] for d in stranger.get("/documents" + query).json()]
         assert doc_id not in ids
+    owner_ids = [d["id"] for d in owner.get("/documents?q=Secret").json()]
+    assert doc_id in owner_ids
 
 
 def test_revoke_with_nothing_to_revoke_is_logged_as_noop():

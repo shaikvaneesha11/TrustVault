@@ -18,3 +18,8 @@ def test_cross_site_write_is_blocked():
 def test_same_site_write_is_allowed():
     r = TestClient(app).post("/auth/logout", headers={"Origin": "http://testserver"})
     assert r.status_code == 200
+
+def test_site_cannot_be_framed():
+    r = TestClient(app).get("/")
+    assert r.headers["x-frame-options"] == "DENY"
+    assert "frame-ancestors 'none'" in r.headers["content-security-policy"]
