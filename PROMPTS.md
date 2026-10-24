@@ -42,6 +42,8 @@ something that did not happen.
 What I did: It now logs "allowed" only when a grant was really deleted, and
 "noop" otherwise. I added a test for it.
 Commit: https://github.com/shaikvaneesha11/TrustVault/commit/31acd18
+How I found it: I asked Claude to review its own code for places where the log
+could say something untrue. It pointed this out, I read the route and agreed.
 
 ## Entry 5 (access tests) - 24 Oct 2026
 Asked: Tests that one user can't reach another user's documents.
@@ -50,9 +52,12 @@ What was wrong: The logout test used the same client, which deletes its own
 cookie after logout, so it would pass even if the server kept the session. The
 search test only checked that a stranger saw nothing, so it would pass even if
 search returned nothing for everyone.
-**What I did:** The logout test now replays the old cookie from a new client.
+What I did: The logout test now replays the old cookie from a new client.
 The search test also checks that the owner finds the document.
 Commit: https://github.com/shaikvaneesha11/TrustVault/commit/e94a8a7
+How I found it: I asked Claude to go through its tests and say which ones could
+never fail. It flagged these two, I checked them and agreed.
+
 ## Entry 6 (access control, I broke it on purpose) - 21 and 22 Oct 2026
 What I did: To see if my tests really test anything, I changed the "no
 grant means no access" line in access.py so it let people in. 3 tests failed
@@ -66,3 +71,15 @@ Commit: none, I did not commit the broken versions.
 - "Explain each line so I can say it back to an interviewer."
 - "Ask me questions after each part."
 - When something failed I pasted the exact error and said which step I was on.
+
+## Entry 7 (login and registration) - 24 Oct 2026
+Asked: Registration and login for the app.
+It gave me: A register route that only checked the email was 5 to 255
+characters long.
+What was wrong: Any text like "abcde" was accepted as an email. I only found
+this when I asked what validation the email had.
+What I did: Added a format check (something, an @, then a domain with a
+dot) and a test with four bad emails. The AI's test expected the same error
+code for all four, but one was rejected earlier by the length check with a
+different code, so the test failed. I changed it to accept either code.
+Commit: https://github.com/shaikvaneesha11/TrustVault/commit/43fedac
