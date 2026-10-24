@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
@@ -18,6 +19,7 @@ SESSION_HOURS = 8
 MAX_FAILS = 5
 WINDOW_MINUTES = 15
 DUMMY_HASH = hash_password("not-a-real-password")
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class RegisterIn(BaseModel):
@@ -38,6 +40,8 @@ def register(data: RegisterIn, db: Session = Depends(get_db)):
     if data.role not in ("owner", "viewer"):
         raise HTTPException(400, "Role must be owner or viewer")
     email = data.email.strip().lower()
+    if not EMAIL_RE.match(email):
+        raise HTTPException(400, "Enter a valid email address")
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(409, "Email already registered")
     user = User(email=email, name=data.name.strip(),

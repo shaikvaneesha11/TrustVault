@@ -70,3 +70,9 @@ def test_login_locks_after_repeated_failures():
         assert r.status_code == 401
     r = client.post("/auth/login", json={"email": email, "password": PASSWORD})
     assert r.status_code == 429
+
+def test_invalid_email_format_rejected():
+    for bad in ("notanemail", "a@b", "two@@x.com", "with space@x.com"):
+        r = TestClient(app).post("/auth/register", json={
+            "email": bad, "name": "T", "password": PASSWORD, "role": "viewer"})
+        assert r.status_code in (400, 422)
