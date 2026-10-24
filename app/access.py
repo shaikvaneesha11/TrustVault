@@ -18,5 +18,5 @@ def can_access(db: Session, user: User, doc: Document, action: str) -> bool:
     perm = db.scalar(select(Permission).where(
         Permission.document_id == doc.id, Permission.user_id == user.id))
     if perm is None:
-        return False                   # no grant, no access (deny by default)
+        return False                 # no grant, no access (deny by default)
     return LEVELS[perm.level] >= LEVELS.get(action, 99)
