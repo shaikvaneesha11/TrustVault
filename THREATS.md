@@ -76,8 +76,9 @@ the owner's, while the owner finds the document.
 ## 11. Script in a document title
 The page builds everything from text nodes, never from HTML strings, and there
 is a Content-Security-Policy that blocks inline script. A test checks the
-header. By hand, I uploaded a document titled <img src=x onerror=alert(1)> and
-it showed as plain text in the list, with no pop-up.
+header. I did not try a hostile title (like <img src=x onerror=alert(1)>) by
+hand, so that part rests on how the page is built and has not been checked in
+a browser.
 
 ## 12. Other sites sending requests for the user
 The cookie is SameSite=Lax, and the server rejects any write (POST, PATCH,
