@@ -43,7 +43,7 @@ What I did: It now logs "allowed" only when a grant was really deleted, and
 "noop" otherwise. I added a test for it.
 Commit: https://github.com/shaikvaneesha11/TrustVault/commit/31acd18
 
-## Entry 5 (access tests) - DATE
+## Entry 5 (access tests) - 24 Oct 2026
 Asked: Tests that one user can't reach another user's documents.
 It gave me: A logout test and a search test that looked fine.
 What was wrong: The logout test used the same client, which deletes its own
@@ -52,8 +52,7 @@ search test only checked that a stranger saw nothing, so it would pass even if
 search returned nothing for everyone.
 **What I did:** The logout test now replays the old cookie from a new client.
 The search test also checks that the owner finds the document.
-Commit: https://github.com/shaikvaneesha11/TrustVault/commit/HASH
-
+Commit: https://github.com/shaikvaneesha11/TrustVault/commit/e94a8a7
 ## Entry 6 (access control, I broke it on purpose) - 21 and 22 Oct 2026
 What I did: To see if my tests really test anything, I changed the "no
 grant means no access" line in access.py so it let people in. 3 tests failed
